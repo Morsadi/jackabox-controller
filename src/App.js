@@ -138,7 +138,16 @@ export default class App extends Component {
           <form onSubmit={this.addPlayer}>
             <input type='text' name='name' placeholder='Smiytek azzin' />
             <input type='text' name='room_code' placeholder='Code al9lawi' />
-            <input type='submit' value='SUBMIT' />
+            <input
+              style={{
+                background: '#EAE1DF',
+                color: '#474747',
+                fontWeight: '700',
+                border: '3px solid #474747',
+              }}
+              type='submit'
+              value='SUBMIT'
+            />
           </form>
         )}
       </div>

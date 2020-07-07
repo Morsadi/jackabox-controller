@@ -2,6 +2,20 @@ body {
   margin: 0;
   background: #edeedd;
 }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  border: 1px solid green;
+  -webkit-text-fill-color: #edeedd;
+  -webkit-box-shadow: 0 0 0px 1000px #607584 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
 ::placeholder {
   color: #edeedd;
   padding: 0 10px;
@@ -36,23 +50,23 @@ body {
 }
 
 .allIn {
-  background: #607483;
   height: 40px;
   width: 180px;
   border-radius: 5px;
-  color: #edeedd;
-  border: none;
   font-size: 18px;
   font-family: roboto slab;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   font-family: 'Raleway', sans-serif;
-  font-weight: 400;
+  background: #eae1df;
+  color: #474747;
+  font-weight: 700;
+  border: 3px solid #474747;
 }
 form {
   display: flex;
   flex-direction: column;
-  width: 30%;
-  margin: 0 auto;
+  width: 60%;
+  margin: 70px auto;
 }
 form input {
   margin-bottom: 20px;
@@ -69,6 +83,7 @@ form input {
   text-align: center;
   box-sizing: border-box;
 }
+
 @keyframes swing {
   0% {
     transform: rotate(2deg);

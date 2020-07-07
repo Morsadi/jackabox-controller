@@ -2,7 +2,11 @@ body {
   margin: 0;
   background: #edeedd;
 }
-
+::placeholder {
+  color: #edeedd;
+  padding: 0 10px;
+  opacity: 0.4;
+}
 .lantern {
   position: absolute;
   top: 0;
@@ -23,6 +27,8 @@ body {
   color: white;
   margin: 0;
   padding: 15px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
 }
 .game_room p {
   font-size: 22px;
@@ -39,8 +45,30 @@ body {
   font-size: 18px;
   font-family: roboto slab;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
 }
-
+form {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  margin: 0 auto;
+}
+form input {
+  margin-bottom: 20px;
+  background: #607483;
+  height: 40px;
+  width: 100%;
+  border-radius: 5px;
+  color: #edeedd;
+  border: none;
+  font-size: 18px;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  text-align: center;
+  box-sizing: border-box;
+}
 @keyframes swing {
   0% {
     transform: rotate(2deg);

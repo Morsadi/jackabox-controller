@@ -16,7 +16,7 @@ export default class App extends Component {
         game_on: false,
       },
       player_id: '',
-      player_name: 'Badr',
+      player_name: '',
     };
     this.game = fire.database().ref('game/');
   }

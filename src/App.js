@@ -144,6 +144,7 @@ export default class App extends Component {
                 color: '#474747',
                 fontWeight: '700',
                 border: '3px solid #474747',
+                cursor: 'pointer',
               }}
               type='submit'
               value='SUBMIT'

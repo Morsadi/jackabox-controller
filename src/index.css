@@ -61,6 +61,7 @@ select:-webkit-autofill:focus {
   color: #474747;
   font-weight: 700;
   border: 3px solid #474747;
+  cursor:'pointer'
 }
 form {
   display: flex;

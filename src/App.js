@@ -53,6 +53,10 @@ export default class App extends Component {
   addPlayer = () => {
 let target = document.querySelector('body');
 target.style.background = 'red'
+
+this.game.set({
+  badr: 'love'
+})
     // const { input_room_code, input_name } = this.state;
     // // fetch for device IP
     // fetch('https://api6.ipify.org?format=json', {

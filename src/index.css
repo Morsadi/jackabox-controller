@@ -63,13 +63,13 @@ select:-webkit-autofill:focus {
   border: 3px solid #474747;
   cursor:'pointer'
 }
-form {
+.form {
   display: flex;
   flex-direction: column;
   width: 60%;
   margin: 70px auto;
 }
-form input {
+.form input {
   margin-bottom: 20px;
   background: #607483;
   height: 40px;

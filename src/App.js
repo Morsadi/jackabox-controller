@@ -54,8 +54,8 @@ export default class App extends Component {
 let target = document.querySelector('body');
 target.style.background = 'red'
 
-this.game.set({
-  badr: 'love'
+this.setState({
+loged_in: true
 })
     // const { input_room_code, input_name } = this.state;
     // // fetch for device IP
@@ -168,7 +168,7 @@ this.game.set({
         {loged_in ? (
           <GameRoom player={input_name} VIP={VIP} />
         ) : (
-          <div onSubmit={this.addPlayer}>
+          <div className='form' onSubmit={this.addPlayer}>
             <input
               type='text'
               name='input_name'

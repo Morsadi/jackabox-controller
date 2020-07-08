@@ -7,6 +7,10 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      input_name: '',
+      input_room_code: '',
+      player_id: '',
+      VIP: false,
       game: {
         current_Q: {
           question: '',
@@ -15,14 +19,21 @@ export default class App extends Component {
         },
         game_on: false,
       },
-      player_id: '',
-      player_name: '',
     };
     this.game = fire.database().ref('game/');
   }
   componentDidMount() {
     this.sync_Q();
   }
+// handling input event
+  eventHandler = (e) => {
+    let key = e.target.name;
+    let value = e.target.value;
+
+    this.setState({
+      [key]: value,
+    });
+  };
 
   sync_Q = () => {
     // using the method "on" will watch players on db. Once changed, update local state
@@ -39,10 +50,9 @@ export default class App extends Component {
     });
   };
 
-  addPlayer = (e) => {
-    e.preventDefault();
-    const input_name = e.currentTarget[0].value;
-    const input_room_code = e.currentTarget[1].value;
+  addPlayer = () => {
+    const { input_room_code, input_name } = this.state;
+    // fetch for device IP
     fetch('https://api6.ipify.org?format=json', {
       method: 'GET',
       headers: {},
@@ -51,13 +61,17 @@ export default class App extends Component {
         return json.json();
       })
       .then((data) => {
+        // then store id in the state
         let ip = data.ip;
+        // keep just the digits
         const player_id = ip.replace(/\D/g, '');
+        // state
         this.setState({
           player_id,
         });
       })
       .then(() => {
+
         const { player_id } = this.state;
         const player = { name: input_name, answer: '' };
 
@@ -69,7 +83,7 @@ export default class App extends Component {
             let newPlayers = {};
             // if players exist
             if (players) {
-              // loop through them
+              // if the current id exists while the name is wrong, throw the error
               if (
                 players[player_id] &&
                 players[player_id].name !== input_name
@@ -78,13 +92,17 @@ export default class App extends Component {
                 alert(
                   'Please, enter the same name you entered at the beginning',
                 );
+                // if the current id exists while the name is correct, log in
+                // this helps if someone disconnected, or refreshed the page
               } else if (
                 players[player_id] &&
                 players[player_id].name === input_name
               ) {
+                // state
                 this.setState({
-                  player_name: input_name,
+                  loged_in: true,
                 });
+                // if the id doesn't exist but the name does, push the player to the list but add Jr. as a suffix
               } else if (
                 !players[player_id] &&
                 players[player_id].name === input_name
@@ -95,33 +113,42 @@ export default class App extends Component {
                   name: `${input_name} Jr.`,
                   answer: '',
                 };
+                // firebase
                 this.game.update({
                   players: newPlayers,
                 });
+                // state
                 this.setState({
-                  player_name: `${input_name} Jr.`,
+                  input_name: `${input_name} Jr.`,
+                  loged_in:true
                 });
+                // add player if they don't exist
               } else {
                 newPlayers = { ...players };
                 // make new players list
                 newPlayers[player_id] = player;
+                // firebase
                 this.game.update({
                   players: newPlayers,
                 });
+                // state
                 this.setState({
-                  player_name: input_name,
+                  loged_in: true,
                 });
               }
-
+              
               return true;
             } else {
-              // else if there is no player, create a list and add current player
+              // else make a new list and add the first player and make him VIP
               newPlayers[player_id] = player;
+              // firebase
               this.game.update({
                 players: newPlayers,
               });
+              // state
               this.setState({
-                player_name: input_name,
+                loged_in: true,
+                VIP: true
               });
             }
           }
@@ -129,15 +156,27 @@ export default class App extends Component {
       });
   };
   render() {
-    const { player_name } = this.state;
+    const { loged_in, input_name, input_room_code, VIP } = this.state;
     return (
       <div>
-        {player_name ? (
-          <GameRoom player={player_name} />
+        {loged_in ? (
+          <GameRoom player={input_name} VIP={VIP} />
         ) : (
-          <form onSubmit={this.addPlayer}>
-            <input type='text' name='name' placeholder='Smiytek azzin' />
-            <input type='text' name='room_code' placeholder='Code al9lawi' />
+          <div onSubmit={this.addPlayer}>
+            <input
+              type='text'
+              name='input_name'
+              onChange={this.eventHandler}
+              placeholder='Smiytek azzin'
+              value={input_name}
+            />
+            <input
+              type='text'
+              name='input_room_code'
+              onChange={this.eventHandler}
+              placeholder='Code al9lawi'
+              value={input_room_code}
+            />
             <input
               style={{
                 background: '#EAE1DF',
@@ -148,8 +187,9 @@ export default class App extends Component {
               }}
               type='submit'
               value='SUBMIT'
+              onClick={this.addPlayer}
             />
-          </form>
+          </div>
         )}
       </div>
     );

@@ -11,6 +11,7 @@ export default class App extends Component {
       input_name: '',
       input_room_code: '',
       player_id: '',
+      error:'',
       VIP: false,
       game: {
         current_Q: {
@@ -84,6 +85,8 @@ export default class App extends Component {
           // if the room_code is the same as entered
           if (room_code === input_room_code) {
             let newPlayers = {};
+            // retrieve the players' names on the db
+            let stored_names = Object.values(players).map((val)=>val.name);
             // if players exist
             if (players) {
               // if the current id exists while the name is wrong, throw the error
@@ -92,9 +95,9 @@ export default class App extends Component {
                 players[player_id].name !== input_name
               ) {
                 // throw message
-                alert(
-                  'Please, enter the same name you entered at the beginning',
-                );
+                this.setState({
+                  error: 'Wrong name hbiba'
+                })
                 // if the current id exists while the name is correct, log in
                 // this helps if someone disconnected, or refreshed the page
               } else if (
@@ -108,13 +111,12 @@ export default class App extends Component {
                 // if the id doesn't exist but the name does, push the player to the list but add Jr. as a suffix
               } else if (
                 !players[player_id] &&
-                players[player_id].name === input_name
+                stored_names.includes(input_name)
               ) {
                 newPlayers = { ...players };
                 // make new players list
                 newPlayers[player_id] = {
                   name: `${input_name} Jr.`,
-                  answer: '',
                 };
                 // firebase
                 this.game.update({
@@ -154,12 +156,16 @@ export default class App extends Component {
                 VIP: true
               });
             }
+          }else {
+            this.setState({
+              error: 'Wrong code hbiba'
+            })
           }
         });
       });
   };
   render() {
-    const { loged_in, input_name, input_room_code, VIP } = this.state;
+    const { loged_in, input_name, input_room_code, VIP, error } = this.state;
     return (
       <div>
         {loged_in ? (
@@ -192,6 +198,7 @@ export default class App extends Component {
               value='SUBMIT'
               onClick={this.addPlayer}
             />
+            {error?<p>{error}</p>:null}
           </div>
         )}
       </div>

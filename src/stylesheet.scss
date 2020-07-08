@@ -1,0 +1,95 @@
+body {
+  margin: 0;
+  background: #edeedd;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  border: 1px solid green;
+  -webkit-text-fill-color: #edeedd;
+  -webkit-box-shadow: 0 0 0px 1000px #607584 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+::placeholder {
+  color: #edeedd;
+  padding: 0 10px;
+  opacity: 0.4;
+}
+.lantern {
+  position: absolute;
+  top: 0;
+  right: 40px;
+  width: 30px;
+  opacity: 0.8;
+  transform-origin: top center;
+  animation: swing 1.5s infinite alternate;
+  animation-timing-function: ease-in-out;
+}
+
+.game_room {
+  text-align: center;
+
+  h1 {
+    background: #607584;
+    color: white;
+    margin: 0;
+    padding: 15px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+  }
+  p {
+    font-size: 22px;
+    color: #2d4d61;
+  }
+}
+
+.allIn {
+  height: 40px;
+  width: 180px;
+  border-radius: 5px;
+  font-size: 18px;
+  font-family: roboto slab;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  font-family: 'Raleway', sans-serif;
+  background: #eae1df;
+  color: #474747;
+  font-weight: 700;
+  border: 3px solid #474747;
+  cursor: 'pointer';
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  margin: 70px auto;
+  input {
+    margin-bottom: 20px;
+    background: #607483;
+    height: 40px;
+    width: 100%;
+    border-radius: 5px;
+    color: #edeedd;
+    border: none;
+    font-size: 18px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+@keyframes swing {
+  0% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(-2deg);
+  }
+}

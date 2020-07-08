@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import 'firebase/database';
 import fire from './config/firebase';
 import GameRoom from './components/gameRome';
+import './stylesheet.scss';
 
 export default class App extends Component {
   constructor(props) {
@@ -51,12 +52,20 @@ export default class App extends Component {
   };
 
   addPlayer = () => {
-let target = document.querySelector('body');
-target.style.background = 'red'
 
-this.setState({
-loged_in: true
-})
+fetch('https://api6.ipify.org?format=json', {
+      method: 'GET',
+      headers: {},
+    })
+      .then((json) => {
+        return json.json();
+      }).then((e)=>{
+        
+        this.setState({
+        loged_in: true,
+        input_name: e.ip
+        })
+      })
     // const { input_room_code, input_name } = this.state;
     // // fetch for device IP
     // fetch('https://api6.ipify.org?format=json', {

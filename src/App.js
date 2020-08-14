@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'firebase/database';
 import fire from './config/firebase';
-import GameRoom from './components/gameRome';
+import WaitRoom from './components/waitRoom';
 import './stylesheet.scss';
 
 export default class App extends Component {
@@ -11,23 +11,76 @@ export default class App extends Component {
       input_name: '',
       input_room_code: '',
       player_id: '',
-      error:'',
-      VIP: false,
+      error: '',
+      // VIP: false,
+      loged_in: false,
+      waiting_room: true,
       game: {
+        play_room: false,
+        start: false,
         current_Q: {
           question: '',
           options: ['', ''],
           answer: '',
         },
-        game_on: false,
       },
     };
     this.game = fire.database().ref('game/');
+    // this.player = fire.database().ref(`game/players/${this.state.player_id}`);
   }
   componentDidMount() {
-    this.sync_Q();
+    this.get_ip();
+    this.sync_game();
   }
-// handling input event
+
+  componentDidUpdate(nextProp, nextState) {
+    const { current_Q } = nextState.game;
+    const user = fire.database().ref(`game/players/${nextState.player_id}`);
+    console.log(user)
+    // start game for players if the current_Q.answer is not empty
+    if (current_Q.answer) {
+      // this.game.once('value', (snap) => {
+        // const { players } = snap.val();
+        // const { player_id } = this.state;
+
+        user.update({
+          waiting_room: false
+        })
+        // let newPlayers = players; // make copy of players
+
+        // newPlayers[player_id] = {
+        //   //change the waiting room of this player
+        //   ...players[player_id],
+        //   waiting_room: false,
+        // };
+
+        // this.game.update({
+        //   players: newPlayers, // replace with the new players
+        // });
+      // });
+    }else {
+      // this.game.once('value', (snap) => {
+      //   const { players } = snap.val();
+      //   const { player_id } = this.state;
+
+      //   let newPlayers = players; // make copy of players
+
+      //   newPlayers[player_id] = {
+      //     //change the waiting room of this player
+      //     ...players[player_id],
+      //     waiting_room: true,
+      //   };
+
+      //   this.game.update({
+      //     players: newPlayers, // replace with the new players
+      //   });
+      // });
+      user.update({
+        waiting_room: true
+      })
+    }
+  }
+  // handling input event
   eventHandler = (e) => {
     let key = e.target.name;
     let value = e.target.value;
@@ -37,27 +90,82 @@ export default class App extends Component {
     });
   };
 
-  sync_Q = () => {
-    // using the method "on" will watch players on db. Once changed, update local state
+  sync_game = () => {
     this.game.on('value', (snap) => {
-      const { current_Q } = snap.val();
-      if (current_Q) {
+      // listen to game changes
+      const game = snap.val();
+      const { room_code, players } = snap.val();
+      const { player_id } = this.state;
+      this.setState({
+        game, // Update game
+      });
+
+      if (players && players[player_id]) {
+        // if the player id already exists
         this.setState({
-          game: {
-            ...this.state.game,
-            current_Q,
-          },
+          loged_in: true, // take player to the game room
+        });
+      } else {
+        console.log('player doesnt exist');
+      }
+    });
+  };
+  get_ip = () => {
+    this.IP_finder()
+      .then((player_id) => {
+        this.setState({
+          player_id,
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  addPlayer = () => {
+    const { input_room_code, input_name, player_id } = this.state;
+
+    const player = { name: input_name, answer: '', waiting_room: true };
+
+    this.game.once('value', (snap) => {
+      const { room_code, players } = snap.val();
+
+      // if the room_code is the same as entered
+      if (room_code === input_room_code) {
+        if (!players) {
+          // if there is no player
+          this.game.update({
+            // add the current player
+            players: { [player_id]: player },
+          });
+          this.setState({
+            // send to waiting room
+            loged_in: true,
+          });
+        } else {
+          // if other players exist
+          let newPlayers = players; // make copy of them
+          newPlayers[player_id] = player; // add the new player
+
+          this.game.update({
+            // update the database with the new players
+            players: newPlayers,
+          });
+          this.setState({
+            // send to waiting room
+            loged_in: true,
+          });
+        }
+      } else {
+        this.setState({
+          error: 'Wrong code hbiba',
         });
       }
     });
   };
 
-  addPlayer = () => {
-
-
-    const { input_room_code, input_name } = this.state;
+  // fetch IP
+  IP_finder = async () => {
     // fetch for device IP
-    fetch('https://api6.ipify.org?format=json', {
+    return fetch('https://api6.ipify.org?format=json', {
       method: 'GET',
       headers: {},
     })
@@ -65,111 +173,52 @@ export default class App extends Component {
         return json.json();
       })
       .then((data) => {
-        // then store id in the state
         let ip = data.ip;
-        // keep just the digits
-        const player_id = ip.replace(/\D/g, '');
-        // state
-        this.setState({
-          player_id,
-        });
-      })
-      .then(() => {
-
-        const { player_id } = this.state;
-        const player = { name: input_name, answer: '' };
-
-        this.game.once('value', (snap) => {
-          const { room_code, players } = snap.val();
-
-          // if the room_code is the same as entered
-          if (room_code === input_room_code) {
-            let newPlayers = {};
-            // retrieve the players' names on the db
-            let stored_names = Object.values(players).map((val)=>val.name);
-            // if players exist
-            if (players) {
-              // if the current id exists while the name is wrong, throw the error
-              if (
-                players[player_id] &&
-                players[player_id].name !== input_name
-              ) {
-                // throw message
-                this.setState({
-                  error: 'Wrong name hbiba'
-                })
-                // if the current id exists while the name is correct, log in
-                // this helps if someone disconnected, or refreshed the page
-              } else if (
-                players[player_id] &&
-                players[player_id].name === input_name
-              ) {
-                // state
-                this.setState({
-                  loged_in: true,
-                });
-                // if the id doesn't exist but the name does, push the player to the list but add Jr. as a suffix
-              } else if (
-                !players[player_id] &&
-                stored_names.includes(input_name)
-              ) {
-                newPlayers = { ...players };
-                // make new players list
-                newPlayers[player_id] = {
-                  name: `${input_name} Jr.`,
-                };
-                // firebase
-                this.game.update({
-                  players: newPlayers,
-                });
-                // state
-                this.setState({
-                  input_name: `${input_name} Jr.`,
-                  loged_in:true
-                });
-                // add player if they don't exist
-              } else {
-                newPlayers = { ...players };
-                // make new players list
-                newPlayers[player_id] = player;
-                // firebase
-                this.game.update({
-                  players: newPlayers,
-                });
-                // state
-                this.setState({
-                  loged_in: true,
-                });
-              }
-              
-              return true;
-            } else {
-              // else make a new list and add the first player and make him VIP
-              newPlayers[player_id] = player;
-              // firebase
-              this.game.update({
-                players: newPlayers,
-              });
-              // state
-              this.setState({
-                loged_in: true,
-                VIP: true
-              });
-            }
-          }else {
-            this.setState({
-              error: 'Wrong code hbiba'
-            })
-          }
-        });
+        const player_id = ip.replace(/\D/g, ''); // keep just the digits
+        return player_id;
       });
   };
+  submit_answer = (res) => {
+    res.preventDefault();
+
+    const checked_input = document.querySelector('input[name=answer]:checked');
+
+    //if the answer was submitted
+    if (checked_input) {
+      console.log(checked_input.value);
+    } else {
+      alert('nothing was selected');
+    }
+    // const form = res.target.length;
+    //   form.map(input=>{
+    //     const current_input = form[input].checked;
+    //     if (current_input){
+    //       console.log(current_input);
+    //     }
+    //   })
+  };
   render() {
-    const { loged_in, input_name, input_room_code, VIP, error } = this.state;
+    const {
+      loged_in,
+      input_name,
+      input_room_code,
+      VIP,
+      error,
+      game,
+      player_id,
+      waiting_room,
+    } = this.state;
     return (
       <div>
         {loged_in ? (
-          <GameRoom player={input_name} VIP={VIP} />
+          <WaitRoom
+            player_id={player_id}
+            submit_answer={this.submit_answer}
+            game={game}
+            // player={input_name}
+            // VIP={VIP}
+            waiting_room={waiting_room}
+          />
         ) : (
           <div className='form' onSubmit={this.addPlayer}>
             <input
@@ -198,7 +247,7 @@ export default class App extends Component {
               value='SUBMIT'
               onClick={this.addPlayer}
             />
-            {error?<p>{error}</p>:null}
+            {error ? <p>{error}</p> : null}
           </div>
         )}
       </div>

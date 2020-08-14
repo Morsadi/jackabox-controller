@@ -12,7 +12,6 @@ export default class App extends Component {
       input_room_code: '',
       player_id: '',
       error: '',
-      // VIP: false,
       loged_in: false,
       waiting_room: true,
       game: {
@@ -75,9 +74,9 @@ export default class App extends Component {
       //     players: newPlayers, // replace with the new players
       //   });
       // });
-      user.update({
-        waiting_room: true
-      })
+      // user.update({
+      //   waiting_room: true
+      // })
     }
   }
   // handling input event
@@ -94,7 +93,7 @@ export default class App extends Component {
     this.game.on('value', (snap) => {
       // listen to game changes
       const game = snap.val();
-      const { room_code, players } = snap.val();
+      const { players } = snap.val();
       const { player_id } = this.state;
       this.setState({
         game, // Update game
@@ -202,7 +201,6 @@ export default class App extends Component {
       loged_in,
       input_name,
       input_room_code,
-      VIP,
       error,
       game,
       player_id,
@@ -215,8 +213,6 @@ export default class App extends Component {
             player_id={player_id}
             submit_answer={this.submit_answer}
             game={game}
-            // player={input_name}
-            // VIP={VIP}
             waiting_room={waiting_room}
           />
         ) : (

@@ -16,7 +16,6 @@ export default class App extends Component {
       waiting_room: true,
       game: {
         play_room: false,
-        start: false,
         current_Q: {
           question: '',
           options: ['', ''],
@@ -32,53 +31,25 @@ export default class App extends Component {
     this.sync_game();
   }
 
-  componentDidUpdate(nextProp, nextState) {
-    const { current_Q } = nextState.game;
-    const user = fire.database().ref(`game/players/${nextState.player_id}`);
-    console.log(user)
-    // start game for players if the current_Q.answer is not empty
-    if (current_Q.answer) {
-      // this.game.once('value', (snap) => {
-        // const { players } = snap.val();
-        // const { player_id } = this.state;
+  // componentDidUpdate(prevProp, prevState, snap) {
+  //   const { current_Q } = prevState.game;
+  //   // console.log('snap', snap)
+  //   // console.log('state answer', this.state.game.current_Q.answer)
+  //   console.log('prev state', prevState.game.current_Q.answer)
+  //   const user = fire.database().ref(`game/players/${this.state.player_id}`);
+  //   // start game for players if the answer changed to true
 
-        user.update({
-          waiting_room: false
-        })
-        // let newPlayers = players; // make copy of players
-
-        // newPlayers[player_id] = {
-        //   //change the waiting room of this player
-        //   ...players[player_id],
-        //   waiting_room: false,
-        // };
-
-        // this.game.update({
-        //   players: newPlayers, // replace with the new players
-        // });
-      // });
-    }else {
-      // this.game.once('value', (snap) => {
-      //   const { players } = snap.val();
-      //   const { player_id } = this.state;
-
-      //   let newPlayers = players; // make copy of players
-
-      //   newPlayers[player_id] = {
-      //     //change the waiting room of this player
-      //     ...players[player_id],
-      //     waiting_room: true,
-      //   };
-
-      //   this.game.update({
-      //     players: newPlayers, // replace with the new players
-      //   });
-      // });
-      // user.update({
-      //   waiting_room: true
-      // })
-    }
-  }
+  //   // if (!current_Q.answer & this.state.game.current_Q.answer) {
+  //   //   user.update({
+  //   //     waiting_room: false,
+  //   //   });
+  //   // }
+  //   if (prevState.game.current_Q.answer){
+  //     console.log('changed to true');
+  //   }else {
+  //     return false
+  //   }
+  // }
   // handling input event
   eventHandler = (e) => {
     let key = e.target.name;
@@ -107,6 +78,7 @@ export default class App extends Component {
       } else {
         console.log('player doesnt exist');
       }
+     
     });
   };
   get_ip = () => {
@@ -179,22 +151,19 @@ export default class App extends Component {
   };
   submit_answer = (res) => {
     res.preventDefault();
-
+    const user = fire.database().ref(`game/players/${this.state.player_id}`);
     const checked_input = document.querySelector('input[name=answer]:checked');
 
     //if the answer was submitted
     if (checked_input) {
-      console.log(checked_input.value);
+      user.update({
+        answer: checked_input.value,
+        waiting_room: true
+      })
+      
     } else {
       alert('nothing was selected');
     }
-    // const form = res.target.length;
-    //   form.map(input=>{
-    //     const current_input = form[input].checked;
-    //     if (current_input){
-    //       console.log(current_input);
-    //     }
-    //   })
   };
   render() {
     const {

@@ -24,6 +24,8 @@ export default class App extends Component {
       },
     };
     this.game = fire.database().ref('game/');
+    // this.submitted = fire.database().ref('game/current_Q/submitted/');
+    // this.current_Q = fire.database().ref('game/current_Q/');
     // this.player = fire.database().ref(`game/players/${this.state.player_id}`);
   }
   componentDidMount() {
@@ -78,7 +80,6 @@ export default class App extends Component {
       } else {
         console.log('player doesnt exist');
       }
-     
     });
   };
   get_ip = () => {
@@ -158,9 +159,29 @@ export default class App extends Component {
     if (checked_input) {
       user.update({
         answer: checked_input.value,
-        waiting_room: true
-      })
-      
+        waiting_room: true,
+      });
+
+      this.game
+        .once('value')
+        .then((data) => {
+          // get current value of 'submitted'
+          return data.val().submitted;
+        })
+        .then((count) => {
+          this.game.update({
+            // add 1 to 'submitted'
+            submitted: count + 1,
+          });
+        }).catch(err=>console.log(err))
+      // .then(value=>{
+      //   console.log('value: ',value);
+      //     this.current_Q.update({// add 1 to 'submitted'
+      //       submitted : value + 1
+      //     })
+      //   }).catch(err=>{
+      //     console.log(err);
+      //   })
     } else {
       alert('nothing was selected');
     }

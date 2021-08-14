@@ -3,6 +3,7 @@ import 'firebase/database';
 import fire from './config/firebase';
 import WaitRoom from './components/waitRoom';
 import './stylesheet.scss';
+const log = console.log;
 
 export default class App extends Component {
   constructor(props) {
@@ -84,7 +85,7 @@ export default class App extends Component {
   };
   get_ip = () => {
     this.IP_finder()
-      .then((player_id) => {
+    .then((player_id) => {
         this.setState({
           player_id,
         });
@@ -137,16 +138,16 @@ export default class App extends Component {
   // fetch IP
   IP_finder = async () => {
     // fetch for device IP
-    return fetch('https://api6.ipify.org?format=json', {
+    return fetch('https://api64.ipify.org?format=json', {
       method: 'GET',
       headers: {},
-    })
-      .then((json) => {
+    }).then((json) => {
         return json.json();
       })
       .then((data) => {
         let ip = data.ip;
         const player_id = ip.replace(/\D/g, ''); // keep just the digits
+        log(player_id)
         return player_id;
       });
   };
